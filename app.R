@@ -1,18 +1,50 @@
 library(shiny)
 
 # Define the fields we want to save from the form
-fields <- c("name", "used_shiny", "r_num_years")
+fields <- c("contract", "contract-holder", "called", "score", "faite")
+
+# define the players
+
+
+joueurs <- c("Erwan", "François", "Hubert", "Gilles", "Thibaut")
+select_taker <- c("selectionner un joueur", joueurs)
+select_called <- c("Personne", joueurs)
+
 source("IO.R")
 
 # Shiny app with 3 fields that the user can submit data for
 
 ui <- fluidPage(
-    DT::dataTableOutput("responses", width = 300), tags$hr(),
-                        textInput("name", "Name", ""),
-                        checkboxInput("used_shiny", "I've built a Shiny app in R before", FALSE),
-                        sliderInput("r_num_years", "Number of years using R",
-                                    0, 25, 2, ticks = FALSE),
-                        actionButton("submit", "Submit")
+    
+    # App title
+    titlePanel("Compter les points au tarot"),
+    
+    # Sidebar layout with input and output definitions ----
+    sidebarLayout(
+        # Sidebar layout with input and output definitions ----
+        
+        # Sidebar panel for inputs ----
+        sidebarPanel(
+            radioButtons(inputId = "contract", label = "Enchères",
+                         choices = list("Petite", "Garde", "Garde-sans", "Garde-contre"),
+                         inline = FALSE),
+            selectInput(inputId = "contract-holder", label = "Preneur", 
+                        choices = list("Selectionner un joueur", "Erwan", "François", "Hubert",
+                                       "Gilles", "Thibaut")),
+            selectInput(inputId = "called", label = "Appelé", 
+                        choices = list("Personne", "Erwan", "François", "Hubert",
+                                       "Gilles", "Thibaut")),
+            numericInput(inputId = "score", label = "score", value = 0),
+            radioButtons(inputId = "faite", label = "Alors ?", 
+                         choices = list("faite", "chutée")),
+            actionButton("submit", "Submit")
+        ),
+        mainPanel(
+            DT::dataTableOutput("responses", width = 300),
+            verbatimTextOutput("points")
+        )
+    )
+
 )
     
 
@@ -27,6 +59,8 @@ server <-  function(input, output, session) {
     # When the Submit button is clicked, save the form data
     observeEvent(input$submit, {
         saveData(formData())
+        scoreData(formData())
+        resetForm(session)
     })
         
     # Show the previous responses
@@ -34,7 +68,11 @@ server <-  function(input, output, session) {
     output$responses <- DT::renderDataTable({
         input$submit
         loadData()
-    })     
+    }, options = list(searching = FALSE))
+    output$points <- renderPrint({
+        input$submit
+        loadTotal()
+    })
 }
 
 # Run the application 
