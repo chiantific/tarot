@@ -41,7 +41,9 @@ ui <- fluidPage(
         ),
         mainPanel(
             DT::dataTableOutput("responses", width = 300),
-            verbatimTextOutput("points")
+            helpText("Score des parties"),
+            textOutput("points")
+            
         )
     )
 
@@ -69,7 +71,7 @@ server <-  function(input, output, session) {
         input$submit
         loadData()
     }, options = list(searching = FALSE))
-    output$points <- renderPrint({
+    output$points <- renderText({
         input$submit
         loadTotal()
     })
