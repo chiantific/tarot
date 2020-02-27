@@ -33,7 +33,7 @@ loadTotal <- function() {
     }
 }
 
-savePlayerScore <- funtion(data){
+savePlayerScore <- function(data){
     
     for (joueur in joueurs) {
         if (joueur == data[2]){

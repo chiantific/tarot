@@ -61,7 +61,6 @@ server <-  function(input, output, session) {
     # When the Submit button is clicked, save the form data
     observeEvent(input$submit, {
         saveData(formData())
-        scoreData(formData())
         resetForm(session)
     })
         
@@ -73,7 +72,8 @@ server <-  function(input, output, session) {
     }, options = list(searching = FALSE))
     output$points <- renderText({
         input$submit
-        loadTotal()
+        score(formData())
+        
     })
 }
 
