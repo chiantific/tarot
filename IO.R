@@ -7,56 +7,25 @@ saveData <- function(data) {
     }
     names(responses) <- c("Contrat", "Preneur", "Appelé", "Score", "faite")
 }
-scoreData <- function(data) {
-    
-    score <- as.numeric(data[4])
-    
-    if(data[5] != "faite") {
-        score <- -score}
-    
-    score <- switch (data[1],
-        "Petite" = score * 1,
-        "Garde" = score * 2,
-        "Garde-sans" = score * 4,
-        "Garde-contre" = score * 6)
-    
-    if (exists("total")) {
-        total <<- c(total, score)
+saveScore <- function(data) {
+    data <- as.data.frame(t(data))
+    if (exists("playersScores")) {
+        playersScores <<- rbind(playersScores, tail(playersScores, 1) + data)
     } else {
-        total <<- score
+        playersScores <<- data
     }
-}
-
-loadTotal <- function() {
-    if (exists("total")) {
-        total
-    }
-}
-
-savePlayerScore <- funtion(data){
-    
-    for (joueur in joueurs) {
-        if (joueur == data[2]){
-            score <- score * 2
-        } else if (joueur == data[3]){
-            score <- score
-        } else {
-            score <- -score
-        }
-        
-    }
-        data <- as.data.frame(t(data))
-        if (exists("playerScore")) {
-            playerScore <<- rbind(playerScore, data)
-        } else {
-            playerScore <<- data
-        }
 }
 
 
 loadData <- function() {
     if (exists("responses")) {
         responses
+    }
+}
+
+loadPlayersScores <- function() {
+    if (exists("playersScores")) {
+        playersScores
     }
 }
 
