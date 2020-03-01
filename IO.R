@@ -12,7 +12,6 @@ saveScore <- function(data) {
     if (exists("playersScores")) {
         playersScores <<- rbind(playersScores, tail(playersScores, 1) + data)
     } else {
-<<<<<<< HEAD
         playersScores <<- data
     }
 }
