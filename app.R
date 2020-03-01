@@ -90,10 +90,7 @@ server <-  function(input, output, session) {
     # When the Submit button is clicked, save the form data
     observeEvent(input$submit, {
         saveData(formData())
-<<<<<<< HEAD
         saveScore(scoreData())
-=======
->>>>>>> 2084cb761c37b7b4b90d0aea428ead3f4d85eba8
         resetForm(session)
     })
         
@@ -108,17 +105,12 @@ server <-  function(input, output, session) {
     # (update with current response when Submit is clicked)
     output$playersScoreTable <- DT::renderDataTable({
         input$submit
-<<<<<<< HEAD
         loadPlayersScores()
     }, options = list(searching = FALSE))
     
     
     output$playerScore <- renderText({
         scoreData()
-=======
-        score(formData())
-        
->>>>>>> 2084cb761c37b7b4b90d0aea428ead3f4d85eba8
     })
     
 }

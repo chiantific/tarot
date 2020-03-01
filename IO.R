@@ -14,29 +14,6 @@ saveScore <- function(data) {
     } else {
 <<<<<<< HEAD
         playersScores <<- data
-=======
-        total <<- score
-    }
-}
-
-loadTotal <- function() {
-    if (exists("total")) {
-        total
-    }
-}
-
-savePlayerScore <- function(data){
-    
-    for (joueur in joueurs) {
-        if (joueur == data[2]){
-            score <- score * 2
-        } else if (joueur == data[3]){
-            score <- score
-        } else {
-            score <- -score
-        }
-        
->>>>>>> 2084cb761c37b7b4b90d0aea428ead3f4d85eba8
     }
 }
 
