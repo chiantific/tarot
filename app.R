@@ -24,30 +24,50 @@ ui <- fluidPage(
         
         # Sidebar panel for inputs ----
         sidebarPanel(
-            radioButtons(inputId = "contract", label = "Enchères",
-                         choices = list("Petite", "Garde", "Garde-sans", "Garde-contre"),
-                         inline = FALSE),
-            selectInput(inputId = "contract-holder", label = "Preneur", 
-                        choices = list("Selectionner un joueur", "Erwan", "François", "Hubert",
-                                       "Gilles", "Thibaut")),
-            selectInput(inputId = "called", label = "Appelé", 
-                        choices = list("Personne", "Erwan", "François", "Hubert",
-                                       "Gilles", "Thibaut")),
-            numericInput(inputId = "score", label = "score", value = 0),
-            radioButtons(inputId = "faite", label = "Alors ?", 
-                         choices = list("faite", "chutée")),
-            actionButton("submit", "Submit")
-        ),
+            
+            tabsetPanel(type = "pills",
+                tabPanel("Enchères",
+                         radioButtons(inputId = "contract", label = "Contrat",
+                                                 choices = list("Petite", "Garde",
+                                                                "Garde-sans", "Garde-contre"),
+                                                 inline = FALSE),
+                         selectInput(inputId = "contract-holder", label = "Preneur", 
+                                     choices = list("Selectionner un joueur", "Erwan",
+                                                    "François", "Hubert", "Gilles", "Thibaut")),
+                         selectInput(inputId = "called", label = "Appelé", 
+                                     choices = list("Personne", "Erwan", "François", "Hubert",
+                                                    "Gilles", "Thibaut")),
+                         numericInput(inputId = "score", label = "score", value = 0),
+                         radioButtons(inputId = "faite", label = "Alors ?", 
+                                      choices = list("faite", "chutée")),
+                         actionButton("submit", "Submit")
+                         ),
+                tabPanel("Annonces",
+                         radioButtons(inputId = "poignee",
+                                      label = "La poignée (8,10 ou 13 atouts)",
+                                      choices = list("pas de poignée", "8 atouts",
+                                                     "10 atouts", "13 atouts")),
+                         selectInput(inputId = "petit", "Le petit au bout",
+                                     choices = list("pas de petit au bout", "Erwan", "François",
+                                                    "Hubert", "Gilles", "Thibaut")),
+                         selectInput(inputId = "chelem", label = "Le Chelem",
+                                     choices = list("pas de chelem", "annoncé et réussi", 
+                                     "annoncé et raté"))
+                         )
+                    )
+            ),
         mainPanel(
-            DT::dataTableOutput("responses", width = 300),
-            DT::dataTableOutput("playersScoreTable", width = 300),
-            textOutput("playerScore")
-            
-            
-        )
+            tabsetPanel(type = "tabs",
+                        tabPanel("Scores",
+                                 DT::dataTableOutput("playerScoreTable", width = "100%")),
+                        tabPanel("Contrats",
+                                 DT::dataTableOutput("responses", width = "100%"))
+                        )
+            )
     )
-
 )
+    
+
     
 
 server <-  function(input, output, session) {
@@ -99,14 +119,14 @@ server <-  function(input, output, session) {
     output$responses <- DT::renderDataTable({
         input$submit
         loadData()
-    }, options = list(searching = FALSE))
+    }, options = list(searching = FALSE, paging = FALSE))
     
     # Show the previous responses
     # (update with current response when Submit is clicked)
     output$playersScoreTable <- DT::renderDataTable({
         input$submit
         loadPlayersScores()
-    }, options = list(searching = FALSE))
+    }, options = list(searching = FALSE, paging = FALSE))
     
     
     output$playerScore <- renderText({
