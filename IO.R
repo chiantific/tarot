@@ -15,7 +15,18 @@ saveScore <- function(data) {
         playersScores <<- data
     }
 }
+joueurs <- c("Erwan", "François", "Hubert", "Gilles", "Thibaut")
+saveRoundScore <- function(data) {
+    data <- as.data.frame(t(data))
+    names(data) <- joueurs
+    roundScore <<- data
+}
 
+loadRoundScore <- function() {
+    if (exists("roundScore")) {
+        roundScore
+    }
+}
 
 loadData <- function() {
     if (exists("responses")) {

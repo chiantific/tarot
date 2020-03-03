@@ -52,16 +52,18 @@ ui <- fluidPage(
                                                     "Hubert", "Gilles", "Thibaut")),
                          selectInput(inputId = "chelem", label = "Le Chelem",
                                      choices = list("pas de chelem", "annoncé et réussi", 
-                                     "annoncé et raté"))
+                                     "annoncé et raté", "non-annoncé et réalisé"))
                          )
                     )
             ),
         mainPanel(
             tabsetPanel(type = "tabs",
+                        tabPanel("Dernière partie", verbatimTextOutput("playerScore")),
                         tabPanel("Scores",
                                  DT::dataTableOutput("playerScoreTable", width = "100%")),
                         tabPanel("Contrats",
-                                 DT::dataTableOutput("responses", width = "100%"))
+                                 DT::dataTableOutput("responses", width = "100%")),
+                        tabPanel("Statistiques", verbatimTextOutput("statistics"))
                         )
             )
     )
@@ -111,6 +113,7 @@ server <-  function(input, output, session) {
     observeEvent(input$submit, {
         saveData(formData())
         saveScore(scoreData())
+        saveRoundScore(scoreData())
         resetForm(session)
     })
         
@@ -119,18 +122,19 @@ server <-  function(input, output, session) {
     output$responses <- DT::renderDataTable({
         input$submit
         loadData()
-    }, options = list(searching = FALSE, paging = FALSE))
+    }, options = list(dom = 't'))
     
     # Show the previous responses
     # (update with current response when Submit is clicked)
-    output$playersScoreTable <- DT::renderDataTable({
+    output$playerScoreTable <- DT::renderDataTable({
         input$submit
         loadPlayersScores()
-    }, options = list(searching = FALSE, paging = FALSE))
+    }, options = list(dom = 't'))
     
     
-    output$playerScore <- renderText({
-        scoreData()
+    output$playerScore <- renderPrint({
+        input$submit
+        loadRoundScore()
     })
     
 }
