@@ -27,6 +27,7 @@ ui <- fluidPage(
             
             tabsetPanel(type = "pills",
                 tabPanel("Enchères",
+                         br(),
                          radioButtons(inputId = "contract", label = "Contrat",
                                                  choices = list("Petite", "Garde",
                                                                 "Garde-sans", "Garde-contre"),
@@ -43,6 +44,7 @@ ui <- fluidPage(
                          actionButton("submit", "Submit")
                          ),
                 tabPanel("Annonces",
+                         br(),
                          radioButtons(inputId = "poignee",
                                       label = "La poignée (8,10 ou 13 atouts)",
                                       choices = list("pas de poignée", "8 atouts",
@@ -85,7 +87,7 @@ server <-  function(input, output, session) {
         
         for (i in 1:length(joueurs)) {
             
-            if(data[3] == "Personne") {
+            if(input$called == "Personne") {
                 
                 if(joueurs[i] == data[2]) {
                     v[i] <- score(data)*4    
