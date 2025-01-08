@@ -6,7 +6,7 @@ contract_multipliers <- c("Petite" = 1, "Garde" = 2, "Garde-sans" = 4, "Garde-co
 # Target scores based on bouts
 target_scores <- c("0" = 56, "1" = 51, "2" = 41, "3" = 36)
 
-calculate_tarot_scores <- function(contract, bouts, score, preneur, appele, players) {
+calculate_tarot_scores <- function(contract, bouts, score, preneur, appele, players, petit) {
     
     
     # Calculate the base result
@@ -14,6 +14,18 @@ calculate_tarot_scores <- function(contract, bouts, score, preneur, appele, play
     result <- (score - target)
     total_score <- (abs(result) + 25) * ifelse(score >= target, 1, -1) * contract_multipliers[contract] |>
         unname()
+    
+    # Adjust for le petit au bout
+    if (petit != "Pas de petit au bout") {
+        petit_score <- 10 * contract_multipliers[contract]
+        if (petit == preneur || petit == appele) {
+            # Petit is taken by the leader team
+            total_score <- total_score + petit_score
+        } else if (petit %in% players[!players %in% c(preneur, appele)]) {
+            # Petit is taken by the defense
+            total_score <- total_score - petit_score
+        }
+    }
     
     # Initialize score table
     scores <- setNames(rep(0, length(players)), players)
