@@ -5,8 +5,6 @@ library(tidyverse)
 # load helper scripts
 source("calcul_score.R")
 
-tarot_scores_file <- "tarot_scores.csv" # path to the CSV file
-
 # Define UI
 ui <- fluidPage(
     useShinyjs(),
@@ -89,8 +87,8 @@ ui <- fluidPage(
             h4("Entries Table"),
             tableOutput("entryTable"),
             br(),
-            h4("Cumulative Scores Table"),
-            tableOutput("cumulativeScores")
+            h4("Scores Table"),
+            tableOutput("scoreTable")
         )
     )
 )
@@ -98,7 +96,7 @@ ui <- fluidPage(
 # Define server logic
 server <- function(input, output, session) {
     
-    # Load existing entries from file or initialize empty (NEW)
+    # Load existing entries from file or initialize empty
     entries <- reactiveVal(
         if(file.exists(tarot_scores_file)){
             read_csv(tarot_scores_file)
@@ -117,10 +115,48 @@ server <- function(input, output, session) {
         }
     )
     
-    # Function to save entries to file
-    save_entries <- function(data) {
-        write_csv(data, tarot_scores_file)
+
+    scores_per_turn <- reactiveVal({
+        data.frame(Partie = "0", as.list(setNames(rep(0, length(players)), players)))
+    })
+    
+    # Function to update cumulative scores
+    update_scores_per_turn <- function() {
+        current_entries <- entries()
+        if (nrow(current_entries) == 0) {
+            # Set scores_per_turn reactiveVal to NULL if no entries
+            scores_per_turn(NULL)
+        } else {
+            # calculate scores for each entry
+            # Initialize a data frame with 0 values for each entry for each player
+            turn_scores_df  <- data.frame(
+                Partie = as.character(seq_len(nrow(current_entries)+1)) ,
+                matrix(0, nrow = nrow(current_entries)+1, ncol = length(players)))
+            colnames(turn_scores_df)[-1] <- players
+            
+            for (i in seq_len(nrow(current_entries))) {
+                entry <- current_entries[i, ]
+                turn_scores <- calculate_tarot_scores(
+                    contract = entry$Contrat,
+                    bouts = as.character(entry$Bouts),
+                    score = entry$Score,
+                    preneur = entry$Preneur,
+                    appele = entry$Appele,
+                    players = players
+                )
+                    turn_scores_df[i, -1] <- turn_scores
+                    turn_scores_df[i+1, -1] <- colSums(turn_scores_df[,-1])
+            }
+            
+            turn_scores_df[i+1, 1] <- "total"
+            scores_per_turn(turn_scores_df)
+        }
     }
+    
+    # Update scores per turn when entries change
+    observe({
+        update_scores_per_turn()
+    })
     
     # Enable/disable both buttons based on "preneur" selection
     observe({
@@ -177,6 +213,8 @@ server <- function(input, output, session) {
         updateTabsetPanel(session, inputId = "entry_tabsetpanel", selected = "Enchères")
     })
     
+   
+    
     # Reset all inputs to default values when "reset_button" is clicked
     observeEvent(input$reset_button_encheres, {
         updateRadioButtons(session, "contrat", selected = "Garde")
@@ -228,6 +266,11 @@ server <- function(input, output, session) {
     # Render the table of entries
     output$entryTable <- renderTable({
         entries()
+    })
+    
+    # Render the cumulative scores table
+    output$scoreTable <- renderTable({
+        scores_per_turn()
     })
 }
 
