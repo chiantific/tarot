@@ -143,7 +143,8 @@ server <- function(input, output, session) {
                     preneur = entry$Preneur,
                     appele = entry$Appele,
                     players = players,
-                    petit = entry$Petit
+                    petit = entry$Petit,
+                    poignee = entry$Poignee
                 )
                     turn_scores_df[i, -1] <- turn_scores
                     turn_scores_df[i+1, -1] <- colSums(turn_scores_df[,-1])

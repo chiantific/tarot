@@ -6,7 +6,7 @@ contract_multipliers <- c("Petite" = 1, "Garde" = 2, "Garde-sans" = 4, "Garde-co
 # Target scores based on bouts
 target_scores <- c("0" = 56, "1" = 51, "2" = 41, "3" = 36)
 
-calculate_tarot_scores <- function(contract, bouts, score, preneur, appele, players, petit) {
+calculate_tarot_scores <- function(contract, bouts, score, preneur, appele, players, petit, poignee) {
     
     
     # Calculate the base result
@@ -24,6 +24,23 @@ calculate_tarot_scores <- function(contract, bouts, score, preneur, appele, play
         } else if (petit %in% players[!players %in% c(preneur, appele)]) {
             # Petit is taken by the defense
             total_score <- total_score - petit_score
+        }
+    }
+    
+    # Adjust for "poignée"
+    if (!is.null(poignee)) {
+        poignee_points <- switch(poignee,
+                                 "8 atouts" = 20,
+                                 "10 atouts" = 30,
+                                 "13 atouts" = 40,
+                                 0)  # Default to 0 if poignee is invalid
+        
+        if (score >= target) {
+            # Contract met: add poignee points
+            total_score <- total_score + poignee_points
+        } else {
+            # Contract not met: subtract poignee points
+            total_score <- total_score - poignee_points
         }
     }
     
